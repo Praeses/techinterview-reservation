@@ -17,7 +17,7 @@ app.set("view engine", "handlebars");
 app.set("http_port", 8081);
 
 app.get("/", function(req, res, next) {
-  res.render("seating_chart");
+  res.render("home");
 });
 
 app.get("/clear_res", function(req, res, next) {
@@ -28,6 +28,17 @@ app.get("/clear_res", function(req, res, next) {
     }
     res.redirect("/");
   })
+});
+
+app.get("/movies", function(req, res, next) {
+  res.render("movies");
+});
+
+app.get("/movies/:theater/:time", function(req, res, next) {
+  payload = {};
+  payload.theater = req.params.theater;
+  payload.time = req.params.time;
+  res.render("seating_chart", payload);
 });
 
 app.get("/seats", function(req, res, next) {
@@ -59,6 +70,7 @@ app.post("/seats", function(req, res, next) {
     res.sendStatus(201);
   });
 });
+
 
 app.use(function(req,res){
   res.type('text/plain');
