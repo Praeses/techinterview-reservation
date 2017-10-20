@@ -1,6 +1,6 @@
 //constants
 const num_of_rows = 10;
-const seats_per_row = 20;
+const seats_per_row = 15;
 
 //create table on page load
 $(document).ready(function() {
@@ -26,6 +26,9 @@ $(document).ready(function() {
                     seat_cell.appendChild(button);
                     row.appendChild(seat_cell);
                 }
+                var row_cell_2 = document.createElement("td");
+                row_cell_2.innerHTML = String.fromCharCode(65 + i);
+                row.appendChild(row_cell_2);
             }
             for (var j = 0; j < response.seats.length; j++) {
                 disable_seat(response.seats[j]);
@@ -51,6 +54,7 @@ function toggle_seat(button) {
 function disable_seat(seat) {
     seat_id = seat.row + "-" + seat.seat_num;
     document.getElementById(seat_id).firstChild.disabled = true;
+    document.getElementById(seat_id).classList.add("reserved_seat");
 }
 
 function reserve_seats(theater_num) {
@@ -70,7 +74,9 @@ function reserve_seats(theater_num) {
     }
     req.addEventListener("load", function() {
         if (req.status >= 200 && req.status < 400) {
+            //remove selected_seat must be last due to HTMLCollection being live
             while (seats.length > 0) {
+                seats[0].classList.add("reserved_seat");
                 seats[0].firstChild.disabled = true;
                 seats[0].classList.remove("selected_seat");
             }

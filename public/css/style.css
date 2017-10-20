@@ -1,3 +1,25 @@
-.selected_seat {
-    background-color: blue;
+.seat button {
+    width: 100%;
+    padding: 0;
+    background-color: gray;
+    color: white;
+}
+
+.selected_seat button{
+    background-color: black;
+    color: white;
+}
+
+#seat_table {
+    table-layout: fixed;
+}
+
+.table td {
+    padding: 10px;
+    text-align: center;
+}
+
+.reserved_seat  button{
+    background-color: #CECECE;
+    color: white;
 }

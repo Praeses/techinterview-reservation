@@ -20,6 +20,16 @@ app.get("/", function(req, res, next) {
   res.render("seating_chart");
 });
 
+app.get("/clear_res", function(req, res, next) {
+  db.pool.query("TRUNCATE TABLE seat_reservation.seats", function(err) {
+    if (err) {
+      next(err);
+      return;
+    }
+    res.redirect("/");
+  })
+});
+
 app.get("/seats", function(req, res, next) {
   db.pool.query("SELECT theater, row, seat_num FROM seat_reservation.seats", function(err, results, fields) {
     if (err) {
