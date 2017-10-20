@@ -34,15 +34,43 @@ app.get("/movies", function(req, res, next) {
   res.render("movies");
 });
 
-app.get("/movies/:theater/:time", function(req, res, next) {
-  payload = {};
-  payload.theater = req.params.theater;
-  payload.time = req.params.time;
-  res.render("seating_chart", payload);
+
+app.get("/seating_chart", function(req, res, next) {
+  res.render("seating_chart");
+});
+
+// app.get("/seats", function(req, res, next) {
+//   db.pool.query("SELECT theater, row, seat_num FROM seat_reservation.seats", function(err, results, fields) {
+//     if (err) {
+//       next(err);
+//       return;
+//     }
+//     payload = {};
+//     payload.seats = results;
+//     res.send(payload);
+//   });
+// });
+
+app.post("/seats", function(req, res, next) {
+  var seats = [];
+  for (var i = 0; i < req.body.seats.length; i++) {
+    seats[i] = [4];
+    seats[i][0] = req.body.seats[i].theater;
+    seats[i][1] = req.body.seats[i].row;
+    seats[i][2] = req.body.seats[i].seat_num;
+    seats[i][3] = req.body.seats[i].time;
+  }
+  db.pool.query("INSERT INTO seat_reservation.seats (theater, row, seat_num, movie_time) VALUES ?", [seats], function (err, result) {
+    if (err) {
+      next(err)
+      return;
+    }
+    res.sendStatus(201);
+  });
 });
 
 app.get("/seats", function(req, res, next) {
-  db.pool.query("SELECT theater, row, seat_num FROM seat_reservation.seats", function(err, results, fields) {
+  db.pool.query("SELECT row, seat_num FROM seat_reservation.seats WHERE movie_time = ? AND theater = ?", [req.query.time, req.query.theater], function(err, results, fields) {
     if (err) {
       next(err);
       return;
@@ -52,25 +80,6 @@ app.get("/seats", function(req, res, next) {
     res.send(payload);
   });
 });
-
-app.post("/seats", function(req, res, next) {
-  var seats = [];
-  for (var i = 0; i < req.body.seats.length; i++) {
-    seats[i] = [4];
-    seats[i][0] = req.body.seats[i].theater;
-    seats[i][1] = req.body.seats[i].row;
-    seats[i][2] = req.body.seats[i].seat_num;
-    seats[i][3] = req.body.seats[i].reserved;
-  }
-  db.pool.query("INSERT INTO seat_reservation.seats (theater, row, seat_num, reserved) VALUES ?", [seats], function (err, result) {
-    if (err) {
-      next(err)
-      return;
-    }
-    res.sendStatus(201);
-  });
-});
-
 
 app.use(function(req,res){
   res.type('text/plain');

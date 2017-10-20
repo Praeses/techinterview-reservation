@@ -2,10 +2,12 @@
 const num_of_rows = 10;
 const seats_per_row = 15;
 
-//create table on page load
+// create table on page load
 $(document).ready(function() {
+    var url = window.location.href;
+    var parts = url.split("?");
     var req = new XMLHttpRequest();
-    req.open("GET", "http://localhost:8081/seats", true);
+    req.open("GET", "http://localhost:8081/seats?" + parts[1], true);
     req.addEventListener("load", function() {
         if (req.status >= 200 && req.status < 400) {
             var response = JSON.parse(req.responseText);
@@ -58,6 +60,8 @@ function disable_seat(seat) {
 }
 
 function reserve_seats(theater_num) {
+    var url = window.location.href;
+    var parts = url.split("time=");
     var seats = document.getElementsByClassName("selected_seat");
     var req = new XMLHttpRequest();
     req.open("POST", "http://localhost:8081/seats", true);
@@ -70,7 +74,7 @@ function reserve_seats(theater_num) {
         payload.seats[i].theater = theater_num;
         payload.seats[i].row = result[0];
         payload.seats[i].seat_num = result[1];
-        payload.seats[i].reserved = 1;
+        payload.seats[i].time = parts[1];
     }
     req.addEventListener("load", function() {
         if (req.status >= 200 && req.status < 400) {
