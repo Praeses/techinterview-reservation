@@ -1,4 +1,5 @@
-
+{{!-- script used to pass seats variable from server to client without client making request.
+this gets put as a variable in the javascript file --}}
 <script>
     var seats = [];
     {{#each seats}}
@@ -7,6 +8,7 @@
         seats[{{@index}}].row = "{{this.row}}"    
     {{/each}}
 </script>
+
 <script src="../../javascript/seating_chart.js"></script>
 <div class="container">
     <div class="row justify-content-center">
@@ -22,12 +24,7 @@
 
     <div class="row">
         <div class="col">
-            <button class="btn btn-primary" onclick="reserve_seats({{theater}}, {{time}})">Reserve Seats</button>
-        </div>
-        <div class="col">
-            <form action="http://localhost:8081/clear_res">
-                <input class="btn btn-primary" type="submit" value="clear all reservations"/>
-            </form>
+            <button class="btn btn-primary" onclick="reserve_seats({{theater}}, '{{time}}')">Reserve Seats</button>
         </div>
     </div>
 </div>
