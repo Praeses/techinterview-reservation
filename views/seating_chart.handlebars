@@ -1,13 +1,5 @@
 {{!-- script used to pass seats variable from server to client without client making request.
 this gets put as a variable in the javascript file --}}
-<script>
-    var seats = [];
-    {{#each seats}}
-        seats[{{@index}}] = {}
-        seats[{{@index}}].seat_num = {{this.seat_num}}
-        seats[{{@index}}].row = "{{this.row}}"    
-    {{/each}}
-</script>
 
 <script src="../../javascript/seating_chart.js"></script>
 <div class="container">
@@ -24,7 +16,7 @@ this gets put as a variable in the javascript file --}}
 
     <div class="row">
         <div class="col">
-            <button class="btn btn-primary" onclick="reserve_seats({{theater}}, '{{time}}')">Reserve Seats</button>
+            <button id="reserve_btn" class="btn btn-primary">Reserve Seats</button>
         </div>
     </div>
 </div>

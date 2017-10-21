@@ -50,17 +50,12 @@ router.get("/clear_res", function(req, res, next) {
   });
   
   router.get("/seats/:theater/:time", function(req, res, next) {
+    console.log("test");
     db.pool.query("SELECT row, seat_num FROM seat_reservation.seats WHERE movie_time = ? AND theater = ?", [req.params.time, req.params.theater], function(err, results, fields) {
       if (err) {
         next(err);
         return;
       }
-      payload = {};
-      payload.theater = req.params.theater;
-      payload.time = req.params.time;
-      if (results.length) {
-        payload.seats = results;
-      }
-      res.render("seating_chart", payload);
+      res.json(results);
     });
   });

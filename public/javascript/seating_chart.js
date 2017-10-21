@@ -3,38 +3,71 @@
 //constants
 const num_of_rows = 10;
 const seats_per_row = 15;
+const url = "http://default-environment.47bjjmtcf6.us-east-2.elasticbeanstalk.com";
+// const url = "http://localhost:8081";
 
 //when document loads, create table based on above constants
 //table has col of letters, then cols of seats, then col of letters
 //button in table cell allows functionality
 $(document).ready(function() {
-    for (var i = 0; i < num_of_rows; i++) {
-        var row = document.createElement("tr");
-        var row_cell = document.createElement("td");
-        row_cell.innerHTML = String.fromCharCode(65 + i);
-        document.getElementById("seat_tbody").appendChild(row);
-        row.appendChild(row_cell);
-        for (var j = 0; j < seats_per_row; j++) {
-            var seat_cell = document.createElement("td");
-            seat_cell.classList.add("seat");
-            seat_cell.id = String.fromCharCode(65 + i) + "-" + (j + 1);
-            var button = document.createElement("button");
-            button.classList.add("btn");
-            button.innerHTML = j + 1;
-            button.onclick = function() {toggle_seat(this)};
-            seat_cell.appendChild(button);
-            row.appendChild(seat_cell);
+    //parse query string
+    var query_parts = parse_query(window.location.href);
+    
+    //bind reserve seats button event listener
+    document.getElementById("reserve_btn").addEventListener("click", function() {
+        reserve_seats(query_parts["theater"], query_parts["time"]);
+    });
+
+    //build table
+    var req = new XMLHttpRequest();
+    req.open("GET", url + "/seats/" + query_parts["theater"] + "/" + query_parts["time"], true);
+    req.addEventListener("load", function() {
+        if (req.status >= 200 && req.status < 400){
+            var response = JSON.parse(req.responseText);
+            for (var i = 0; i < num_of_rows; i++) {
+                var row = document.createElement("tr");
+                var row_cell = document.createElement("td");
+                row_cell.innerHTML = String.fromCharCode(65 + i);
+                document.getElementById("seat_tbody").appendChild(row);
+                row.appendChild(row_cell);
+                for (var j = 0; j < seats_per_row; j++) {
+                    var seat_cell = document.createElement("td");
+                    seat_cell.classList.add("seat");
+                    seat_cell.id = String.fromCharCode(65 + i) + "-" + (j + 1);
+                    var button = document.createElement("button");
+                    button.classList.add("btn");
+                    button.innerHTML = j + 1;
+                    button.onclick = function() {toggle_seat(this)};
+                    seat_cell.appendChild(button);
+                    row.appendChild(seat_cell);
+                }
+                var row_cell_2 = document.createElement("td");
+                row_cell_2.innerHTML = String.fromCharCode(65 + i);
+                row.appendChild(row_cell_2);
+            }
+            //seats is a global variable added by the template 
+            //this disables already reserved seats
+            if (response.length > 0) {
+                for (var j = 0; j < response.length; j++) {
+                    disable_seat(response[j]);
+                }
+            }
         }
-        var row_cell_2 = document.createElement("td");
-        row_cell_2.innerHTML = String.fromCharCode(65 + i);
-        row.appendChild(row_cell_2);
-    }
-    //seats is a global variable added by the template 
-    //this disables already reserved seats
-    for (var j = 0; j < seats.length; j++) {
-        disable_seat(seats[j]);
-    }
+        else {
+            console.log("woops");
+        }
+    });
+    req.send();
 });
+
+function parse_query(url){
+    var query_string = {};
+    url.replace(
+        new RegExp("([^?=&]+)(=([^&]*))?", "g"),
+        function($0, $1, $2, $3) { query_string[$1] = $3; }
+    );
+    return query_string;
+}
 
 //switches seat between selected and not selected before user reserves
 function toggle_seat(button) {
@@ -63,7 +96,7 @@ function reserve_seats(theater, time) {
     //returns seats in a live HTMLCollection
     var seats = document.getElementsByClassName("selected_seat");
     var req = new XMLHttpRequest();
-    req.open("POST", "http://localhost:8081/seats", true);
+    req.open("POST", url + "/seats", true);
     req.setRequestHeader("Content-Type", "application/json");
     var payload = {};
     payload.seats = [seats.length];
