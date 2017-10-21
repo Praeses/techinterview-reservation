@@ -6,7 +6,7 @@ var db = require('./config/dbconnect');
 var bodyParser = require("body-parser");
 
 var app = express();
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static("public"));
 
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
@@ -39,18 +39,6 @@ app.get("/seating_chart", function(req, res, next) {
   res.render("seating_chart");
 });
 
-// app.get("/seats", function(req, res, next) {
-//   db.pool.query("SELECT theater, row, seat_num FROM seat_reservation.seats", function(err, results, fields) {
-//     if (err) {
-//       next(err);
-//       return;
-//     }
-//     payload = {};
-//     payload.seats = results;
-//     res.send(payload);
-//   });
-// });
-
 app.post("/seats", function(req, res, next) {
   var seats = [];
   for (var i = 0; i < req.body.seats.length; i++) {
@@ -80,6 +68,29 @@ app.get("/seats", function(req, res, next) {
     res.send(payload);
   });
 });
+
+app.get("/seats/:theater/:time", function(req, res, next) {
+  db.pool.query("SELECT row, seat_num FROM seat_reservation.seats WHERE movie_time = ? AND theater = ?", [req.params.time, req.params.theater], function(err, results, fields) {
+    if (err) {
+      next(err);
+      return;
+    }
+    payload = {};
+    payload.theater = req.params.theater;
+    payload.time = req.params.time;
+    if (results.length) {
+      payload.seats = results;
+    }
+      res.render("seating_chart", payload);
+  });
+});
+
+// app.get("/seats/:theater/:time", function(req, res, next) {
+//   payload = {};
+//   payload.time = req.params.time;
+//   payload.theater = req.params.theater;
+//   res.render("seating_chart", payload);
+// });
 
 app.use(function(req,res){
   res.type('text/plain');
