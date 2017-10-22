@@ -168,7 +168,7 @@ function build_confirmation_string(theater, time, seats) {
         confirmation_string += seats[i].row + "-" + seats[i].seat_num + ", ";
     }
     confirmation_string = confirmation_string.substring(0, confirmation_string.lastIndexOf(", "));
-    confirmation_string += " at " + format_time(time) + " in theater " + theater;
+    confirmation_string += " at " + format_time(time) + " in theater " + theater + ".";
     return confirmation_string;
 }
 
