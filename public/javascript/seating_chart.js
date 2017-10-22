@@ -3,8 +3,9 @@
 //constants
 const num_of_rows = 10;
 const seats_per_row = 15;
-const url = "http://default-environment.47bjjmtcf6.us-east-2.elasticbeanstalk.com";
-// const url = "http://localhost:8081";
+//one for test and one for production
+// const url = "http://default-environment.47bjjmtcf6.us-east-2.elasticbeanstalk.com";
+const url = "http://localhost:8081";
 
 //when document loads, create table based on above constants
 //table has col of letters, then cols of seats, then col of letters

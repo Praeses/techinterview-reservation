@@ -16,6 +16,7 @@ router.get("/clear_res", function(req, res, next) {
       }
       res.render("dev_tools");
     })
+
   });
 
   router.get("/dev_tools", function(req, res, next) {
@@ -50,7 +51,6 @@ router.get("/clear_res", function(req, res, next) {
   });
   
   router.get("/seats/:theater/:time", function(req, res, next) {
-    console.log("test");
     db.pool.query("SELECT row, seat_num FROM seat_reservation.seats WHERE movie_time = ? AND theater = ?", [req.params.time, req.params.theater], function(err, results, fields) {
       if (err) {
         next(err);
