@@ -35,12 +35,12 @@
     padding-right: 20px;
 }
 
-ul {
+.showtimes {
     list-style: none;
     padding-left: 0;
 }
 
-ul li {
+.showtimes li {
     display: inline;
 }
 

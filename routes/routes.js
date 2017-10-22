@@ -19,43 +19,49 @@ router.get("/clear_res", function(req, res, next) {
 
   });
 
-  router.get("/dev_tools", function(req, res, next) {
-    res.render("dev_tools");
-  });
-
-  router.get("/movies", function(req, res, next) {
-    res.render("movies");
-  });
+router.post("/confirmation", function(req, res, next) {
+  payload = {};
+  payload.seats = req.body.seats;
+  res.render("confirmation", payload);
+});
   
-  
-  router.get("/seating_chart", function(req, res, next) {
-    res.render("seating_chart");
-  });
+router.get("/dev_tools", function(req, res, next) {
+  res.render("dev_tools");
+});
 
-  router.post("/seats", function(req, res, next) {
-    var seats = [];
-    for (var i = 0; i < req.body.seats.length; i++) {
-      seats[i] = [4];
-      seats[i][0] = req.body.seats[i].theater;
-      seats[i][1] = req.body.seats[i].row;
-      seats[i][2] = req.body.seats[i].seat_num;
-      seats[i][3] = req.body.seats[i].time;
+router.get("/movies", function(req, res, next) {
+  res.render("movies");
+});
+
+
+router.get("/seating_chart", function(req, res, next) {
+  res.render("seating_chart");
+});
+
+router.post("/seats", function(req, res, next) {
+  var seats = [];
+  for (var i = 0; i < req.body.seats.length; i++) {
+    seats[i] = [4];
+    seats[i][0] = req.body.seats[i].theater;
+    seats[i][1] = req.body.seats[i].row;
+    seats[i][2] = req.body.seats[i].seat_num;
+    seats[i][3] = req.body.seats[i].time;
+  }
+  db.pool.query("INSERT INTO seat_reservation.seats (theater, row, seat_num, movie_time) VALUES ?", [seats], function (err, result) {
+    if (err) {
+      next(err)
+      return;
     }
-    db.pool.query("INSERT INTO seat_reservation.seats (theater, row, seat_num, movie_time) VALUES ?", [seats], function (err, result) {
-      if (err) {
-        next(err)
-        return;
-      }
-      res.sendStatus(201);
-    });
+    res.redirect("/");
   });
+});
   
-  router.get("/seats/:theater/:time", function(req, res, next) {
-    db.pool.query("SELECT row, seat_num FROM seat_reservation.seats WHERE movie_time = ? AND theater = ?", [req.params.time, req.params.theater], function(err, results, fields) {
-      if (err) {
-        next(err);
-        return;
-      }
-      res.json(results);
-    });
+router.get("/seats/:theater/:time", function(req, res, next) {
+  db.pool.query("SELECT row, seat_num FROM seat_reservation.seats WHERE movie_time = ? AND theater = ?", [req.params.time, req.params.theater], function(err, results, fields) {
+    if (err) {
+      next(err);
+      return;
+    }
+    res.json(results);
   });
+});

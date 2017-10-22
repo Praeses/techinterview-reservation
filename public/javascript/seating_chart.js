@@ -3,6 +3,7 @@
 //constants
 const num_of_rows = 10;
 const seats_per_row = 15;
+
 //one for test and one for production
 // const url = "http://default-environment.47bjjmtcf6.us-east-2.elasticbeanstalk.com";
 const url = "http://localhost:8081";
@@ -16,7 +17,7 @@ $(document).ready(function() {
     
     //bind reserve seats button event listener
     document.getElementById("reserve_btn").addEventListener("click", function() {
-        reserve_seats(query_parts["theater"], query_parts["time"]);
+        confirm_seats(query_parts["theater"], query_parts["time"]);
     });
 
     //build table
@@ -93,7 +94,45 @@ function disable_seat(seat) {
 //on successful response, it marks them as reserved and disables them client side
 //theater = theater number of movie
 //time = time of movie
-function reserve_seats(theater, time) {
+// function reserve_seats(theater, time) {
+//     //returns seats in a live HTMLCollection
+//     var seats = document.getElementsByClassName("selected_seat");
+//     var req = new XMLHttpRequest();
+//     req.open("POST", url + "/seats", true);
+//     req.setRequestHeader("Content-Type", "application/json");
+//     var payload = {};
+//     payload.seats = [seats.length];
+//     for (var i = 0; i < seats.length; i++) {
+//         var result = seats[i].id.split("-");
+//         payload.seats[i] = {};
+//         payload.seats[i].theater = theater;
+//         payload.seats[i].row = result[0];
+//         payload.seats[i].seat_num = result[1];
+//         payload.seats[i].time = time;
+//     }
+//     req.addEventListener("load", function() {
+//         if (req.status >= 200 && req.status < 400) {
+//             var newDoc = document.open("text/html", "replace");
+//             newDoc.write(req.responseText);
+//             newDoc.close();
+//             //remove selected_seat must be last due to HTMLCollection being live
+//             // while (seats.length > 0) {
+//             //     seats[0].classList.add("reserved_seat");
+//             //     seats[0].firstChild.disabled = true;
+//             //     seats[0].classList.remove("selected_seat");
+//             // }
+//         }
+//         else {
+//             console.log(req.status);
+//         }
+//     });
+//     req.send(JSON.stringify(payload));
+// }
+
+//finds all selected seats and makes POST request to server to display confirmation
+//theater = theater number of movie
+//time = time of movie
+function confirm_seats(theater, time) {
     //returns seats in a live HTMLCollection
     var seats = document.getElementsByClassName("selected_seat");
     var req = new XMLHttpRequest();
@@ -111,16 +150,31 @@ function reserve_seats(theater, time) {
     }
     req.addEventListener("load", function() {
         if (req.status >= 200 && req.status < 400) {
-            //remove selected_seat must be last due to HTMLCollection being live
-            while (seats.length > 0) {
-                seats[0].classList.add("reserved_seat");
-                seats[0].firstChild.disabled = true;
-                seats[0].classList.remove("selected_seat");
-            }
+            window.location.href = url + "/";
         }
         else {
             console.log(req.status);
         }
     });
-    req.send(JSON.stringify(payload));
+    confirmation_string = build_confirmation_string(theater, time, payload.seats);
+    if (confirm(confirmation_string) == true) {
+        req.send(JSON.stringify(payload));
+    }
+}
+
+function build_confirmation_string(theater, time, seats) {
+    var confirmation_string = "You are reserving the following seats: ";
+    for (var i = 0; i < seats.length; i++) {
+        confirmation_string += seats[i].row + "-" + seats[i].seat_num + ", ";
+    }
+    confirmation_string = confirmation_string.substring(0, confirmation_string.lastIndexOf(", "));
+    confirmation_string += " at " + format_time(time) + " in theater " + theater;
+    return confirmation_string;
+}
+
+function format_time(time) {
+    var ftime = time.substring(0, 2);
+    ftime += ":";
+    ftime += time.substring(2, 4);
+    return ftime;
 }
