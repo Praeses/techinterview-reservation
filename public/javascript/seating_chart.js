@@ -17,7 +17,7 @@ $(document).ready(function() {
     
     //bind reserve seats button event listener
     document.getElementById("reserve_btn").addEventListener("click", function() {
-        confirm_seats(query_parts["theater"], query_parts["time"]);
+        reserve_seats(query_parts["theater"], query_parts["time"]);
     });
 
     //build table
@@ -91,32 +91,48 @@ function disable_seat(seat) {
 }
 
 
-function reserve_seats(payload) {
-    var req = new XMLHttpRequest();
-    req.open("POST", url + "/seats", true);
-    req.setRequestHeader("Content-Type", "application/json");
-    req.addEventListener("load", function() {
-        if (req.status >= 200 && req.status < 400) {
-            window.location.href = url + "/confirmation";
-        }
-        else {
-            console.log(req.status);
-        }
-    });
-    req.send(JSON.stringify(payload));
-}
+// function confirm_seats(payload) {
+//     var req = new XMLHttpRequest();
+//     req.open("POST", url + "/seats", true);
+//     req.setRequestHeader("Content-Type", "application/json");
+//     var email = document.getElementById("email").value;
+//     var email_dup = document.getElementById("email_dup").value;
+//     if (email === email_dup) {
+//         payload.email = document.getElementById("email").value;
+//         req.addEventListener("load", function() {
+//             if (req.status >= 200 && req.status < 400) {
+//                 window.location.href = url + "/confirmation";
+//             }
+//             else {
+//                 console.log(req.status);
+//             }
+//         });
+//         req.send(JSON.stringify(payload));
+//     }
+//     else {
+//         error_msg = document.createElement("span");
+//         error_msg.innerHTML = "Email and Confirm Email must match."
+//         document.getElementById("form_group").appendChild(error_msg);
+//     }
+// }
 
 //finds all selected seats and makes POST request to server to display confirmation
 //theater = theater number of movie
 //time = time of movie
-function confirm_seats(theater, time) {
-    //returns seats in a live HTMLCollection
-    var seats = document.getElementsByClassName("selected_seat");
+function reserve_seats(theater, time) {
+    //returns seats in a live HTMLCollection, so convert to array to avoid headaches
+    var seats = Array.from(document.getElementsByClassName("selected_seat"));
+    if (seats.length == 0) {
+        alert("You didn't select any seats!");
+        return;
+    }
     var req = new XMLHttpRequest();
     req.open("POST", url + "/checkout", true);
     req.setRequestHeader("Content-Type", "application/json");
     var payload = {};
     payload.seats = [seats.length];
+    payload.theater = theater;
+    payload.time = time;
     for (var i = 0; i < seats.length; i++) {
         var result = seats[i].id.split("-");
         payload.seats[i] = {};
@@ -128,9 +144,11 @@ function confirm_seats(theater, time) {
     req.addEventListener("load", function() {
         if (req.status >= 200 && req.status < 400) {
             $("html").html(req.responseText);
-            document.getElementById("confirm_btn").addEventListener("click", function() {
-                reserve_seats(payload);
-            });
+            // document.getElementById("confirm_btn").addEventListener("click", function() {
+            //     confirm_seats(payload);
+            // });
+            document.getElementById("email_dup").onchange = function() {validate_email(document.getElementById("email").value, document.getElementById("email_dup").value);};
+            document.getElementById("seats_input").value = JSON.stringify(payload.seats);
         }
         else {
             console.log(req.status);
@@ -139,19 +157,30 @@ function confirm_seats(theater, time) {
     req.send(JSON.stringify(payload));
 }
 
-function build_confirmation_string(theater, time, seats) {
-    var confirmation_string = "You are reserving the following seats: ";
-    for (var i = 0; i < seats.length; i++) {
-        confirmation_string += seats[i].row + "-" + seats[i].seat_num + ", ";
-    }
-    confirmation_string = confirmation_string.substring(0, confirmation_string.lastIndexOf(", "));
-    confirmation_string += " at " + format_time(time) + " in theater " + theater + ".";
-    return confirmation_string;
-}
+// function build_confirmation_string(theater, time, seats) {
+//     var confirmation_string = "You are reserving the following seats: ";
+//     for (var i = 0; i < seats.length; i++) {
+//         confirmation_string += seats[i].row + "-" + seats[i].seat_num + ", ";
+//     }
+//     confirmation_string = confirmation_string.substring(0, confirmation_string.lastIndexOf(", "));
+//     confirmation_string += " at " + format_time(time) + " in theater " + theater + ".";
+//     return confirmation_string;
+// }
 
 function format_time(time) {
     var ftime = time.substring(0, 2);
     ftime += ":";
     ftime += time.substring(2, 4);
     return ftime;
+}
+
+function validate_email(email, email_dup) {
+    if (email !== email_dup) {
+        console.log(email + " " + email_dup);
+        document.getElementById("email_dup").setCustomValidity("Email and Confirm Email must match.");
+        document.getElementById("email_dup").reportValidity();
+        return false;
+    }
+    document.getElementById("email_dup").setCustomValidity("");
+    return true;
 }
