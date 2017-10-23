@@ -19,10 +19,14 @@ router.get("/clear_res", function(req, res, next) {
 
   });
 
-router.post("/confirmation", function(req, res, next) {
+router.post("/checkout", function(req, res, next) {
   payload = {};
   payload.seats = req.body.seats;
-  res.render("confirmation", payload);
+  res.render("checkout", payload);
+});
+
+router.get("/confirmation", function(req, res, next) {
+  res.render("confirmation");
 });
   
 router.get("/dev_tools", function(req, res, next) {
@@ -52,7 +56,7 @@ router.post("/seats", function(req, res, next) {
       next(err)
       return;
     }
-    res.redirect("/");
+    res.sendStatus(201);
   });
 });
   

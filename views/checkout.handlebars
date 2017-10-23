@@ -1,0 +1,26 @@
+<div class="container">
+    <div class="row">
+        <h1>Seat Reservation Checkout</h1>
+    </div>
+    <div class="row">
+        <h3>Please review the following information before confirming reservations.</h3>
+    </div>
+    <div class="row">
+        <h4>Seats</h4>
+    </div>
+    <div class="row">
+        {{#if seats}}
+        <ul>
+            {{#each seats}}
+                <li><span><strong>Theater:</strong> {{this.theater}} <strong>Row:</strong> {{this.row}}  <strong>Seat:</strong> {{this.seat_num}}  <strong>Time:</strong> {{this.time}}</span></li>
+            {{/each}}
+        </ul>
+        {{/if}}
+    </div>
+    <div class="row">
+        <div class="col">
+            <button class="btn btn-primary" id="confirm_btn">Confirm</button>
+            <a href="/seating_chart" class="btn btn-primary">Edit</a>
+        </div>
+    </div>
+</div>

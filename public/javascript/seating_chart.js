@@ -90,44 +90,21 @@ function disable_seat(seat) {
     document.getElementById(seat_id).classList.add("reserved_seat");
 }
 
-//finds all selected seats and makes POST request to server to reserve them
-//on successful response, it marks them as reserved and disables them client side
-//theater = theater number of movie
-//time = time of movie
-// function reserve_seats(theater, time) {
-//     //returns seats in a live HTMLCollection
-//     var seats = document.getElementsByClassName("selected_seat");
-//     var req = new XMLHttpRequest();
-//     req.open("POST", url + "/seats", true);
-//     req.setRequestHeader("Content-Type", "application/json");
-//     var payload = {};
-//     payload.seats = [seats.length];
-//     for (var i = 0; i < seats.length; i++) {
-//         var result = seats[i].id.split("-");
-//         payload.seats[i] = {};
-//         payload.seats[i].theater = theater;
-//         payload.seats[i].row = result[0];
-//         payload.seats[i].seat_num = result[1];
-//         payload.seats[i].time = time;
-//     }
-//     req.addEventListener("load", function() {
-//         if (req.status >= 200 && req.status < 400) {
-//             var newDoc = document.open("text/html", "replace");
-//             newDoc.write(req.responseText);
-//             newDoc.close();
-//             //remove selected_seat must be last due to HTMLCollection being live
-//             // while (seats.length > 0) {
-//             //     seats[0].classList.add("reserved_seat");
-//             //     seats[0].firstChild.disabled = true;
-//             //     seats[0].classList.remove("selected_seat");
-//             // }
-//         }
-//         else {
-//             console.log(req.status);
-//         }
-//     });
-//     req.send(JSON.stringify(payload));
-// }
+
+function reserve_seats(payload) {
+    var req = new XMLHttpRequest();
+    req.open("POST", url + "/seats", true);
+    req.setRequestHeader("Content-Type", "application/json");
+    req.addEventListener("load", function() {
+        if (req.status >= 200 && req.status < 400) {
+            window.location.href = url + "/confirmation";
+        }
+        else {
+            console.log(req.status);
+        }
+    });
+    req.send(JSON.stringify(payload));
+}
 
 //finds all selected seats and makes POST request to server to display confirmation
 //theater = theater number of movie
@@ -136,7 +113,7 @@ function confirm_seats(theater, time) {
     //returns seats in a live HTMLCollection
     var seats = document.getElementsByClassName("selected_seat");
     var req = new XMLHttpRequest();
-    req.open("POST", url + "/seats", true);
+    req.open("POST", url + "/checkout", true);
     req.setRequestHeader("Content-Type", "application/json");
     var payload = {};
     payload.seats = [seats.length];
@@ -146,20 +123,20 @@ function confirm_seats(theater, time) {
         payload.seats[i].theater = theater;
         payload.seats[i].row = result[0];
         payload.seats[i].seat_num = result[1];
-        payload.seats[i].time = time;
+        payload.seats[i].time = format_time(time);
     }
     req.addEventListener("load", function() {
         if (req.status >= 200 && req.status < 400) {
-            window.location.href = url + "/";
+            $("html").html(req.responseText);
+            document.getElementById("confirm_btn").addEventListener("click", function() {
+                reserve_seats(payload);
+            });
         }
         else {
             console.log(req.status);
         }
     });
-    confirmation_string = build_confirmation_string(theater, time, payload.seats);
-    if (confirm(confirmation_string) == true) {
-        req.send(JSON.stringify(payload));
-    }
+    req.send(JSON.stringify(payload));
 }
 
 function build_confirmation_string(theater, time, seats) {

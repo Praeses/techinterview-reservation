@@ -1,34 +1,8 @@
-<script src="../../javascript/confirmation.js"></script>
 <div class="container">
     <div class="row">
-        <h1>Seat Reservation Confirmation</h1>
+        <h1>Thank you for reserving tickets with Praeses Theater Inc.!</h1>
     </div>
     <div class="row">
-        <h3>Please review the following information before confirming reservations.</h3>
-    </div>
-    <div class="row">
-        <h4>Seats</h4>
-    </div>
-    <div class="row">
-        {{#if seats}}
-        <ul>
-            {{#each seats}}
-                <li><span>Theater: {{this.theater}}  Row: {{this.row}}  Seat: {{this.seat_num}}  Time: {{this.time}}</span></li>
-            {{/each}}
-        </ul>
-        {{/if}}
-    </div>
-    <div class="row">
-        <div class="col">
-            {{!-- <form method="POST" action="/seats">
-                <input type="hidden" name="seats" value={{seats}}>
-                <input type="submit" class="btn btn-primary">
-            </form> --}}
-            <button class="btn btn-primary" value={{seats}} id="confirm_btn">Confirm</button>
-        </div>
-        <div class="col">
-            <a href="/seating_chart" class="btn btn-primary">Edit</a>
-            {{!-- <button class="btn btn-primary" id="edit_btn" onclick="edit()">Edit</button> --}}
-        </div>
+        <p>Your tickets will be emailed to you shortly.  If you do not receive the email within 24 hours, please call customer service at 1-800-emails_not_implemented.</p>
     </div>
 </div>
