@@ -17,7 +17,7 @@ $(document).ready(function() {
     
     //bind reserve seats button event listener
     document.getElementById("reserve_btn").addEventListener("click", function() {
-        reserve_seats(query_parts["theater"], query_parts["time"]);
+        reserve_seats(query_parts["theater"], query_parts["time"], query_parts["title"]);
     });
 
     //build table
@@ -26,6 +26,7 @@ $(document).ready(function() {
     req.addEventListener("load", function() {
         if (req.status >= 200 && req.status < 400){
             var response = JSON.parse(req.responseText);
+            document.getElementById("title_time").innerHTML = decodeURI(query_parts["title"]) + " at " + format_time(query_parts["time"]);
             for (var i = 0; i < num_of_rows; i++) {
                 var row = document.createElement("tr");
                 var row_cell = document.createElement("td");
@@ -119,7 +120,7 @@ function disable_seat(seat) {
 //finds all selected seats and makes POST request to server to display confirmation
 //theater = theater number of movie
 //time = time of movie
-function reserve_seats(theater, time) {
+function reserve_seats(theater, time, title) {
     //returns seats in a live HTMLCollection, so convert to array to avoid headaches
     var seats = Array.from(document.getElementsByClassName("selected_seat"));
     if (seats.length == 0) {
@@ -133,6 +134,7 @@ function reserve_seats(theater, time) {
     payload.seats = [seats.length];
     payload.theater = theater;
     payload.time = time;
+    payload.title = title;
     for (var i = 0; i < seats.length; i++) {
         var result = seats[i].id.split("-");
         payload.seats[i] = {};

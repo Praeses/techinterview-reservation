@@ -24,6 +24,7 @@ router.post("/checkout", function(req, res, next) {
   payload.seats = req.body.seats;
   payload.theater = req.body.theater;
   payload.time = req.body.time;
+  payload.title = req.body.title;
   res.render("checkout", payload);
 });
 
