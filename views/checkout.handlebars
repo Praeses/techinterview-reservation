@@ -6,30 +6,29 @@
         <h3>Please review the following information before confirming reservations.</h3>
     </div>
     <div class="row col">
-        <h4>Seats</h4>
+        <h4>Seats for {{title}}</h4>
     </div>
     <div class="row col">
-        {{#if seats}}
         <ul>
             {{#each seats}}
                 <li><span><strong>Theater:</strong> {{this.theater}} <strong>Row:</strong> {{this.row}}  <strong>Seat:</strong> {{this.seat_num}}  <strong>Time:</strong> {{this.time}}</span></li>
             {{/each}}
         </ul>
-        {{/if}}
     </div>
     <div class="row col">
-        <form method="POST" action="/seats">
+        <form id="email_form" method="POST" action="/seats">
             <div class="form-group">
                 <label for="email">Email</label>
-                <input class="form-control" type="email" name="email" id="email" required>             
+                <input class="form-control" type="email" name="email" id="email" title="Email" required>             
             </div>
             <div class="form-group">
                 <label for="email_dup">Confirm Email</label>
-                <input class="form-control" type="email" name="email_dup" id="email_dup" required>
+                <input class="form-control" type="email" name="email_dup" id="email_dup" title="Email Confirmation" required>
                 <small id="email_requirements" class="form-text text-muted">Email and Confirm Email must match.</small>             
             </div>
             <div class="form-group">
-                <input type="hidden" id="seats_input" name="seats">    
+                <input type="hidden" id="seats_input" name="seats">
+                <input type="hidden" id="movie_title" name="movie_title" value="{{title}}">    
                 <input type="submit" class="btn btn-primary" value="Submit" name="submit" id="submit">          
             </div>
         </form>

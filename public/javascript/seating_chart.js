@@ -1,5 +1,3 @@
-//This file builds the table into the template and contains functions changing seat status.
-
 //constants
 const num_of_rows = 10;
 const seats_per_row = 15;
@@ -8,11 +6,11 @@ const seats_per_row = 15;
 // const url = "http://default-environment.47bjjmtcf6.us-east-2.elasticbeanstalk.com";
 const url = "http://localhost:8081";
 
-//when document loads, create table based on above constants
+//when seating chart template loads, create table based on above constants
 //table has col of letters, then cols of seats, then col of letters
 //button in table cell allows functionality
 $(document).ready(function() {
-    //parse query string
+    //parse query string to get theather number, movie time, and movie title
     var query_parts = parse_query(window.location.href);
     
     //bind reserve seats button event listener
@@ -20,13 +18,17 @@ $(document).ready(function() {
         reserve_seats(query_parts["theater"], query_parts["time"], query_parts["title"]);
     });
 
-    //build table
+    //make request to get already reserved seats and build table
     var req = new XMLHttpRequest();
     req.open("GET", url + "/seats/" + query_parts["theater"] + "/" + query_parts["time"], true);
     req.addEventListener("load", function() {
         if (req.status >= 200 && req.status < 400){
+            //already reserved seats for this theater and time
             var response = JSON.parse(req.responseText);
+            //add title and time as headers on template
             document.getElementById("title_time").innerHTML = decodeURI(query_parts["title"]) + " at " + format_time(query_parts["time"]);
+            //create seating chart
+            //row looks like A 1 2 3 A
             for (var i = 0; i < num_of_rows; i++) {
                 var row = document.createElement("tr");
                 var row_cell = document.createElement("td");
@@ -48,7 +50,6 @@ $(document).ready(function() {
                 row_cell_2.innerHTML = String.fromCharCode(65 + i);
                 row.appendChild(row_cell_2);
             }
-            //seats is a global variable added by the template 
             //this disables already reserved seats
             if (response.length > 0) {
                 for (var j = 0; j < response.length; j++) {
@@ -57,12 +58,14 @@ $(document).ready(function() {
             }
         }
         else {
-            console.log("woops");
+            console.log("Error getting reserved seats");
         }
     });
     req.send();
 });
 
+//parses the query string into key:value pairs.  
+//taken from https://stevenbenner.com/2010/03/javascript-regex-trick-parse-a-query-string-into-an-object/
 function parse_query(url){
     var query_string = {};
     url.replace(
@@ -91,35 +94,10 @@ function disable_seat(seat) {
     document.getElementById(seat_id).classList.add("reserved_seat");
 }
 
-
-// function confirm_seats(payload) {
-//     var req = new XMLHttpRequest();
-//     req.open("POST", url + "/seats", true);
-//     req.setRequestHeader("Content-Type", "application/json");
-//     var email = document.getElementById("email").value;
-//     var email_dup = document.getElementById("email_dup").value;
-//     if (email === email_dup) {
-//         payload.email = document.getElementById("email").value;
-//         req.addEventListener("load", function() {
-//             if (req.status >= 200 && req.status < 400) {
-//                 window.location.href = url + "/confirmation";
-//             }
-//             else {
-//                 console.log(req.status);
-//             }
-//         });
-//         req.send(JSON.stringify(payload));
-//     }
-//     else {
-//         error_msg = document.createElement("span");
-//         error_msg.innerHTML = "Email and Confirm Email must match."
-//         document.getElementById("form_group").appendChild(error_msg);
-//     }
-// }
-
-//finds all selected seats and makes POST request to server to display confirmation
+//finds all selected seats and makes POST request to server to display checkout
 //theater = theater number of movie
 //time = time of movie
+//title = title of movie
 function reserve_seats(theater, time, title) {
     //returns seats in a live HTMLCollection, so convert to array to avoid headaches
     var seats = Array.from(document.getElementsByClassName("selected_seat"));
@@ -130,26 +108,28 @@ function reserve_seats(theater, time, title) {
     var req = new XMLHttpRequest();
     req.open("POST", url + "/checkout", true);
     req.setRequestHeader("Content-Type", "application/json");
+    //create object to send in post
     var payload = {};
     payload.seats = [seats.length];
     payload.theater = theater;
     payload.time = time;
-    payload.title = title;
+    payload.title = decodeURI(title);
     for (var i = 0; i < seats.length; i++) {
-        var result = seats[i].id.split("-");
+        //split id to get row and seat_num
+        var id_parts = seats[i].id.split("-");
         payload.seats[i] = {};
         payload.seats[i].theater = theater;
-        payload.seats[i].row = result[0];
-        payload.seats[i].seat_num = result[1];
+        payload.seats[i].row = id_parts[0];
+        payload.seats[i].seat_num = id_parts[1];
+        //format time for better display
         payload.seats[i].time = format_time(time);
     }
     req.addEventListener("load", function() {
         if (req.status >= 200 && req.status < 400) {
+            //load template that is returned
             $("html").html(req.responseText);
-            // document.getElementById("confirm_btn").addEventListener("click", function() {
-            //     confirm_seats(payload);
-            // });
-            document.getElementById("email_dup").onchange = function() {validate_email(document.getElementById("email").value, document.getElementById("email_dup").value);};
+            //bind function to make sure email address matches its confirmation box
+            document.getElementById("email_dup").onchange = function() {check_elements_match(document.getElementById("email"), document.getElementById("email_dup"));};
             document.getElementById("seats_input").value = JSON.stringify(payload.seats);
         }
         else {
@@ -159,30 +139,28 @@ function reserve_seats(theater, time, title) {
     req.send(JSON.stringify(payload));
 }
 
-// function build_confirmation_string(theater, time, seats) {
-//     var confirmation_string = "You are reserving the following seats: ";
-//     for (var i = 0; i < seats.length; i++) {
-//         confirmation_string += seats[i].row + "-" + seats[i].seat_num + ", ";
-//     }
-//     confirmation_string = confirmation_string.substring(0, confirmation_string.lastIndexOf(", "));
-//     confirmation_string += " at " + format_time(time) + " in theater " + theater + ".";
-//     return confirmation_string;
-// }
-
+//changes time from HHMMSS to HH:MM
+//no effect if time already in HH:MM form
 function format_time(time) {
-    var ftime = time.substring(0, 2);
-    ftime += ":";
-    ftime += time.substring(2, 4);
-    return ftime;
+    if (time.length == 6) {
+        var ftime = time.substring(0, 2);
+        ftime += ":";
+        ftime += time.substring(2, 4);
+        return ftime;
+    }
+    else {
+        return time;
+    }
 }
 
-function validate_email(email, email_dup) {
-    if (email !== email_dup) {
-        console.log(email + " " + email_dup);
-        document.getElementById("email_dup").setCustomValidity("Email and Confirm Email must match.");
-        document.getElementById("email_dup").reportValidity();
-        return false;
+//checks that the value of 2 elements is the same
+//alters the message displayed to user if element values do not match
+function check_elements_match(element_1, element_2) {
+    if (element_1.value !== element_2.value) {
+        element_2.setCustomValidity(element_1.title + " and " + element_2.title + " must match.");
+        element_2.reportValidity();
     }
-    document.getElementById("email_dup").setCustomValidity("");
-    return true;
+    else {
+        element_2.setCustomValidity("");
+    }
 }

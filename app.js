@@ -7,8 +7,9 @@ var bodyParser = require("body-parser");
 var routes = require("./routes/routes");
 
 var app = express();
-app.use(express.static("public"));
 
+//serve static files
+app.use(express.static("public"));
 
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
@@ -16,6 +17,7 @@ app.use(bodyParser.json());
 app.engine("handlebars", handlebars.engine);
 app.set("view engine", "handlebars");
 
+//port 8081 for aws
 app.set("http_port", 8081);
 
 app.use("/", routes);
