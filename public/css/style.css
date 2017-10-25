@@ -1,0 +1,50 @@
+.seat button {
+    width: 100%;
+    padding: 0;
+    background-color: gray;
+    color: white;
+}
+
+.selected_seat button{
+    background-color: black;
+    color: white;
+}
+
+#seat_table {
+    table-layout: fixed;
+}
+
+.table td {
+    text-align: center;
+    width: 60px;
+}
+
+.reserved_seat  button {
+    background-color: #CECECE;
+    color: white;
+}
+
+.navbar {
+    margin-bottom: 20px;
+}
+
+.movie-listing {
+    background-color: #CECECE;
+    text-align: center;
+    border: 1px solid white;
+    padding-right: 20px;
+}
+
+.showtimes {
+    list-style: none;
+    padding-left: 0;
+}
+
+.showtimes li {
+    display: inline;
+}
+
+main {
+    margin: 0px 10px 0px 10px;
+}
+

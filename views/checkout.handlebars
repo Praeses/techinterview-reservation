@@ -1,0 +1,42 @@
+<div class="container">
+    <div class="row col">
+        <h1>Seat Reservation Checkout</h1>
+    </div>
+    <div class="row col">
+        <h3>Please review the following information before confirming reservations.</h3>
+    </div>
+    <div class="row col">
+        <h4>Seats for {{title}}</h4>
+    </div>
+    <div class="row col">
+        <ul>
+            {{#each seats}}
+                <li><span><strong>Theater:</strong> {{this.theater}} <strong>Row:</strong> {{this.row}}  <strong>Seat:</strong> {{this.seat_num}}  <strong>Time:</strong> {{this.time}}</span></li>
+            {{/each}}
+        </ul>
+    </div>
+    <div class="row col">
+        <form id="email_form" method="POST" action="/seats">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input class="form-control" type="email" name="email" id="email" title="Email" required>             
+            </div>
+            <div class="form-group">
+                <label for="email_dup">Confirm Email</label>
+                <input class="form-control" type="email" name="email_dup" id="email_dup" title="Email Confirmation" required>
+                <small id="email_requirements" class="form-text text-muted">Email and Confirm Email must match.</small>             
+            </div>
+            <div class="form-group">
+                {{!-- use hidden inputs to submit selected seats and movie title.  movie title submitted so it can be displayed if race condition occurs and use is sent back to seat selection --}}
+                <input type="hidden" id="seats_input" name="seats">
+                <input type="hidden" id="movie_title" name="movie_title" value="{{title}}">    
+                <input type="submit" class="btn btn-primary" value="Submit" name="submit" id="submit">          
+            </div>
+        </form>
+    </div>
+    <div class="row">
+        <div class="col">
+            <a href="/seating_chart?theater={{theater}}&time={{time}}&title={{title}}" class="btn btn-primary">Edit</a>
+        </div>
+    </div>
+</div>

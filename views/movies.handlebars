@@ -1,0 +1,55 @@
+<div class="container">
+    <div class="row justify-content-center">
+        <h1>Movies</h1>
+    </div>
+    <div class="row">
+        {{!-- Theater 1 --}}
+        <div class="col-sm-4 movie-listing">
+            <div>
+                <h3>JO's Bizarre Adventure</h3>
+            </div>
+            <div>
+                <h6>Showtimes</h6>
+            </div>
+            <div>
+                <ul class="showtimes">
+                    {{!-- url is seats/theater_num/time in HHMMSS format --}}
+                    <li><a href="/seating_chart?theater=1&time=124500&title=JO's Bizarre Adventure" >12:45</a></li>
+                    <li><a href="/seating_chart?theater=1&time=033000&title=JO's Bizarre Adventure" >03:30</a></li>
+                    <li><a href="/seating_chart?theater=1&time=061500&title=JO's Bizarre Adventure" >06:15</a></li>
+                </ul>
+            </div>
+        </div>
+        {{!-- Theater 2 --}}
+        <div class="col-sm-4 movie-listing">
+            <div>
+                <h3>Attack of the BT Apps!</h3>
+            </div>
+            <div >
+                <h6>Showtimes</h6>
+            </div>
+            <div>
+                <ul class="showtimes">
+                    <li><a href="/seating_chart?theater=2&time=010000&title=Attack of the BT Apps!" >01:00</a></li>
+                    <li><a href="/seating_chart?theater=2&time=033000&title=Attack of the BT Apps!" >03:30</a></li>
+                    <li><a href="/seating_chart?theater=2&time=070000&title=Attack of the BT Apps!" >07:00</a></li>
+                </ul>
+            </div>
+        </div>
+        {{!-- Theater 3 --}}
+        <div class="col-sm-4 movie-listing">
+            <div>
+                <h3>The Lost Calls of CSD</h3>
+            </div>
+            <div>
+                <h6>Showtimes</h6>
+            </div>
+            <div>
+                <ul class="showtimes">
+                    <li><a href="/seating_chart?theater=3&time=024500&title=The Lost Calls of CSD" >02:45</a></li>
+                    <li><a href="/seating_chart?theater=3&time=064500&title=The Lost Calls of CSD" >06:45</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
