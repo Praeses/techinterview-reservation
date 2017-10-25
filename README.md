@@ -31,13 +31,13 @@ If you would prefer to run the website locally, use the instructions below.
 
 
 Intructions for Nagivating Website
-Click the "Movies" link in the navbar to see the list of movies and showtimes.
-Click a showtime to see a seating chart for that showing.
-Seats that are dark gray are available and seats that are a light gray are already reserved.
-Click on available seats to select or unselect them.
-When you have made your selections, click the reserve seats button at the bottom left of the seating chart.
-On the checkout page, enter your email address in each form input and click the submit button to reserve your seats.
-If you wish to edit your selected seats, click the edit button to return to the previous page.
+1) Click the "Movies" link in the navbar to see the list of movies and showtimes.
+2) Click a showtime to see a seating chart for that showing.
+3) Seats that are dark gray are available and seats that are a light gray are already reserved.
+4) Click on available seats to select or unselect them.
+5) When you have made your selections, click the reserve seats button at the bottom left of the seating chart.
+6) On the checkout page, enter your email address in each form input and click the submit button to reserve your seats.
+7) If you wish to edit your selected seats, click the edit button to return to the previous page.
 
 
 # Technical Interview Homework: Movie Theater Seat Reservations
