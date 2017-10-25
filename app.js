@@ -22,6 +22,30 @@ app.set("http_port", 8081);
 
 app.use("/", routes);
 
+db.pool.getConnection(function(err) {
+  if (err) {
+    console.log("error connecting to database");
+    next(err);
+    return;
+  }
+  else {
+    db.pool.query("CREATE TABLE IF NOT EXISTS seat_reservation.seats(" +
+      "id int(11) NOT NULL AUTO_INCREMENT," +
+      "theater int(11) NOT NULL," +
+      "row varchar(5) NOT NULL," +
+      "seat_num int(11) NOT NULL," +
+      "movie_time time NOT NULL," + 
+      "PRIMARY KEY (`id`)," + 
+      "UNIQUE KEY row_UNIQUE (row, theater, seat_num, movie_time)" +
+      ") ENGINE=InnoDB DEFAULT CHARSET=utf8", function(err) {
+      if (err) {
+        next(err);
+        return;
+      }
+    });
+  }
+});
+
 app.use(function(req,res){
   res.type('text/plain');
   res.status(404);

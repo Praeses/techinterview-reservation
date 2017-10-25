@@ -1,7 +1,33 @@
 The website is hosted at http://default-environment.47bjjmtcf6.us-east-2.elasticbeanstalk.com.
-If you would like to run the website locally, use the instructions below.
+Please use this link to view the website.
+
+If you would prefer to run the website locally, use the instructions below.
+1) In the root directory of the application, run npm install to install the required dependencies.  
+2) In /public/javascript/seating_chart.js, comment out the url for AWS on line 6 and comment in line 7 for the local host url.
+3) Create a directory named "config" in the root directory.  In config, create a file named "dbconnect.js".  
+4) In dbconnect.js add the following lines
+    var mysql = require("mysql");
+    var pool = mysql.createPool({
+        host  : "your host",
+        user  : "your username",
+        password: "your database password",
+        database: "seat_reservation"
+    });
+    module.exports.pool = pool;
 
 
+    For example, my dbconnect.js for local testing looks like 
+    var mysql = require("mysql");
+    var pool = mysql.createPool({
+        host  : 'localhost',
+        user  : 'root',
+        password: 'testPassword',
+        database: 'seat_reservation'
+    });
+    module.exports.pool = pool;
+
+5) You will need to create a database schema named "seat_reservation".  Upon running the website for the first time, it will create the necessary table in the schema.
+6) In the root directory, begin the application with "node app.js"
 
 
 Intructions for Nagivating Website
