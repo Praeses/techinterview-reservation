@@ -1,4 +1,4 @@
-//constants
+//constants used to define dimensions of theater
 const num_of_rows = 10;
 const seats_per_row = 15;
 
@@ -6,11 +6,9 @@ const seats_per_row = 15;
 // const url = "http://default-environment.47bjjmtcf6.us-east-2.elasticbeanstalk.com";
 const url = "http://localhost:8081";
 
-//when seating chart template loads, create table based on above constants
-//table has col of letters, then cols of seats, then col of letters
-//button in table cell allows functionality
+//parses the query string, binds reserve_btn, and builds the seating chart
 $(document).ready(function() {
-    //parse query string to get theather number, movie time, and movie title
+    //parse query string to get theater number, movie time, and movie title
     var query_parts = parse_query(window.location.href);
     
     //bind reserve seats button event listener
@@ -25,10 +23,11 @@ $(document).ready(function() {
         if (req.status >= 200 && req.status < 400){
             //already reserved seats for this theater and time
             var response = JSON.parse(req.responseText);
-            //add title and time as headers on template
+            //add title and time to top of view
             document.getElementById("title_time").innerHTML = decodeURI(query_parts["title"]) + " at " + format_time(query_parts["time"]);
             //create seating chart
-            //row looks like A 1 2 3 A
+            //pattern looks like A 1 2 3 ... A
+            //                   B 1 2 3 ... B
             for (var i = 0; i < num_of_rows; i++) {
                 var row = document.createElement("tr");
                 var row_cell = document.createElement("td");
@@ -50,7 +49,7 @@ $(document).ready(function() {
                 row_cell_2.innerHTML = String.fromCharCode(65 + i);
                 row.appendChild(row_cell_2);
             }
-            //this disables already reserved seats
+            //disables already reserved seats
             if (response.length > 0) {
                 for (var j = 0; j < response.length; j++) {
                     disable_seat(response[j]);
@@ -64,8 +63,52 @@ $(document).ready(function() {
     req.send();
 });
 
+
+//checks that the value of 2 elements is the same
+//alters the message displayed to user if element values do not match
+//@param: element_1 - the first element
+//@param: element_2 - the second element
+function check_elements_match(element_1, element_2) {
+    if (element_1.value !== element_2.value) {
+        element_2.setCustomValidity(element_1.title + " and " + element_2.title + " must match.");
+        element_2.reportValidity();
+    }
+    else {
+        element_2.setCustomValidity("");
+    }
+}
+
+
+//disables button and marks it as reserved
+//@param: seat - seat object from server used to get the id of the td corresponding to that seat
+function disable_seat(seat) {
+    seat_id = seat.row + "-" + seat.seat_num;
+    document.getElementById(seat_id).firstChild.disabled = true;
+    document.getElementById(seat_id).classList.add("reserved_seat");
+}
+
+
+//changes time from HHMMSS to HH:MM
+//no effect if time already in HH:MM form
+//@param: time - time in HHMMSS format
+//@return ftime - time in HH:MM format
+function format_time(time) {
+    if (time.length == 6) {
+        var ftime = time.substring(0, 2);
+        ftime += ":";
+        ftime += time.substring(2, 4);
+        return ftime;
+    }
+    else {
+        return time;
+    }
+}
+
+
 //parses the query string into key:value pairs.  
 //taken from https://stevenbenner.com/2010/03/javascript-regex-trick-parse-a-query-string-into-an-object/
+//@param: url - the url string
+//@return: query_string - object containing key:value pairs of query string values.  if ?theater=1 then query_parts["theater"] = 1
 function parse_query(url){
     var query_string = {};
     url.replace(
@@ -75,32 +118,15 @@ function parse_query(url){
     return query_string;
 }
 
-//switches seat between selected and not selected before user reserves
-function toggle_seat(button) {
-    var cell = button.parentElement;
-    if (cell.classList.contains("selected_seat")) {
-        cell.classList.remove("selected_seat");
-    }
-    else {
-        cell.classList.add("selected_seat");
-    }
-}
-
-//disables button and marks it as reserved
-//seat is a seat object used to get the id of the td corresponding to that seat
-function disable_seat(seat) {
-    seat_id = seat.row + "-" + seat.seat_num;
-    document.getElementById(seat_id).firstChild.disabled = true;
-    document.getElementById(seat_id).classList.add("reserved_seat");
-}
 
 //finds all selected seats and makes POST request to server to display checkout
-//theater = theater number of movie
-//time = time of movie
-//title = title of movie
+//@param: theater - theater number of movie
+//@param: time - time of movie
+//@param: title - title of movie
 function reserve_seats(theater, time, title) {
     //returns seats in a live HTMLCollection, so convert to array to avoid headaches
     var seats = Array.from(document.getElementsByClassName("selected_seat"));
+    //make sure they select at least 1 seat to reserve
     if (seats.length == 0) {
         alert("You didn't select any seats!");
         return;
@@ -130,6 +156,7 @@ function reserve_seats(theater, time, title) {
             $("html").html(req.responseText);
             //bind function to make sure email address matches its confirmation box
             document.getElementById("email_dup").onchange = function() {check_elements_match(document.getElementById("email"), document.getElementById("email_dup"));};
+            //attach seats as hidden input to form to allow for easier submitting to server
             document.getElementById("seats_input").value = JSON.stringify(payload.seats);
         }
         else {
@@ -139,28 +166,15 @@ function reserve_seats(theater, time, title) {
     req.send(JSON.stringify(payload));
 }
 
-//changes time from HHMMSS to HH:MM
-//no effect if time already in HH:MM form
-function format_time(time) {
-    if (time.length == 6) {
-        var ftime = time.substring(0, 2);
-        ftime += ":";
-        ftime += time.substring(2, 4);
-        return ftime;
-    }
-    else {
-        return time;
-    }
-}
 
-//checks that the value of 2 elements is the same
-//alters the message displayed to user if element values do not match
-function check_elements_match(element_1, element_2) {
-    if (element_1.value !== element_2.value) {
-        element_2.setCustomValidity(element_1.title + " and " + element_2.title + " must match.");
-        element_2.reportValidity();
+//switches seat between selected and not selected before user reserves
+//@param: button - the button that is clicked that represents the seat
+function toggle_seat(button) {
+    var cell = button.parentElement;
+    if (cell.classList.contains("selected_seat")) {
+        cell.classList.remove("selected_seat");
     }
     else {
-        element_2.setCustomValidity("");
+        cell.classList.add("selected_seat");
     }
 }

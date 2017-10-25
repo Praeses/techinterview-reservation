@@ -8,6 +8,12 @@ router.get("/", function(req, res, next) {
     res.render("home");
 });
 
+
+//for all the routes below
+//@param: req - request object which contains data from client
+//@param: res - response object used to send data to client
+//@param: next - function used to pass error to error handling functions
+
 //triggered when clear reservations button clicked in dev ops
 //clears table of all reservations
 router.get("/clear_res", function(req, res, next) {
@@ -30,16 +36,12 @@ router.post("/checkout", function(req, res, next) {
   res.render("checkout", payload);
 });
 
-// router.get("/confirmation", function(req, res, next) {
-//   res.render("confirmation");
-// });
-  
-
+//renders dev_tools page
 router.get("/dev_tools", function(req, res, next) {
   res.render("dev_tools");
 });
 
-//movie/showtime listings
+// renders movie/showtime listings
 router.get("/movies", function(req, res, next) {
   res.render("movies");
 });
@@ -51,7 +53,7 @@ router.get("/seating_chart", function(req, res, next) {
 
 //adds reserved seats to database
 router.post("/seats", function(req, res, next) {
-  //must be in next array for bulk insert
+  //data must be in nested array for bulk mysql insert
   var json_seats = JSON.parse(req.body.seats);
   var seats = [];
   for (var i = 0; i < json_seats.length; i++) {

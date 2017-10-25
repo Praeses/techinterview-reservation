@@ -27,6 +27,7 @@
                 <small id="email_requirements" class="form-text text-muted">Email and Confirm Email must match.</small>             
             </div>
             <div class="form-group">
+                {{!-- use hidden inputs to submit selected seats and movie title.  movie title submitted so it can be displayed if race condition occurs and use is sent back to seat selection --}}
                 <input type="hidden" id="seats_input" name="seats">
                 <input type="hidden" id="movie_title" name="movie_title" value="{{title}}">    
                 <input type="submit" class="btn btn-primary" value="Submit" name="submit" id="submit">          
