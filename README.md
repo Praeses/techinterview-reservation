@@ -3,9 +3,8 @@ Please use this link to view the website.
 
 If you would prefer to run the website locally, use the instructions below.
 1) In the root directory of the application, run npm install to install the required dependencies.  
-2) In /public/javascript/seating_chart.js, comment out the url for AWS on line 6 and comment in line 7 for the local host url.
-3) Create a directory named "config" in the root directory.  In config, create a file named "dbconnect.js".  
-4) In dbconnect.js add the following lines
+2) Create a directory named "config" in the root directory.  In config, create a file named "dbconnect.js".  
+3) In dbconnect.js add the following lines
     var mysql = require("mysql");
     var pool = mysql.createPool({
         host  : "your host",
@@ -26,8 +25,9 @@ If you would prefer to run the website locally, use the instructions below.
     });
     module.exports.pool = pool;
 
-5) You will need to create a database schema named "seat_reservation".  Upon running the website for the first time, it will create the necessary table in the schema.
-6) In the root directory, begin the application with "node app.js"
+4) You will need to create a database schema named "seat_reservation".  Upon running the website for the first time, it will create the necessary table in the schema.
+5) In the root directory, begin the application with "node app.js"
+6) The application will run on http://localhost:8081
 
 
 Intructions for Nagivating Website
