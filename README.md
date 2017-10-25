@@ -1,10 +1,12 @@
+**Hosted**
 The website is hosted at http://default-environment.47bjjmtcf6.us-east-2.elasticbeanstalk.com.
 Please use this link to view the website.
 
-If you would prefer to run the website locally, use the instructions below.
+**If you would prefer to run the website locally, use the instructions below.**
 1) In the root directory of the application, run npm install to install the required dependencies.  
 2) Create a directory named "config" in the root directory.  In config, create a file named "dbconnect.js".  
 3) In dbconnect.js add the following lines
+    ```
     var mysql = require("mysql");
     var pool = mysql.createPool({
         host  : "your host",
@@ -13,9 +15,10 @@ If you would prefer to run the website locally, use the instructions below.
         database: "seat_reservation"
     });
     module.exports.pool = pool;
-
+    ```
 
     For example, my dbconnect.js for local testing looks like 
+    ```
     var mysql = require("mysql");
     var pool = mysql.createPool({
         host  : 'localhost',
@@ -24,13 +27,14 @@ If you would prefer to run the website locally, use the instructions below.
         database: 'seat_reservation'
     });
     module.exports.pool = pool;
+    ```
 
 4) You will need to create a database schema named "seat_reservation".  Upon running the website for the first time, it will create the necessary table in the schema.
 5) In the root directory, begin the application with "node app.js"
 6) The application will run on http://localhost:8081
 
 
-Intructions for Nagivating Website
+**Intructions for Nagivating Website**
 1) Click the "Movies" link in the navbar to see the list of movies and showtimes.
 2) Click a showtime to see a seating chart for that showing.
 3) Seats that are dark gray are available and seats that are a light gray are already reserved.
